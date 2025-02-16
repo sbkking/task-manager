@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasks page</title>
+    <script>
+        function toggleEditForm(taskId) {
+            const form = document.getElementById('edit-form-' + taskId);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</head>
+<body>
+    <h1>Your Tasks</h1>
+    <a href="/">Log out</a>
+    <a href="/tasks/create">Create Task</a>
+    
+    <ul>
+        <% tasks.forEach(task => { %>
+            <li>
+                <strong><%= task.title %></strong> - <%= task.status %>
+
+                <!-- Delete Task Form -->
+                <form action="/tasks/delete/<%= task._id %>" method="POST" style="display:inline;">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit">Delete</button>
+                </form>
+
+                <!-- Button to Show Edit Form -->
+                <button onclick="toggleEditForm('<%= task._id %>')">Edit</button>
+
+                <!-- Edit Task Form (Hidden by Default) -->
+                <form id="edit-form-<%= task._id %>" action="/tasks/update/<%= task._id %>?_method=PUT" method="POST" style="display:none;">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <input type="text" name="title" value="<%= task.title %>" required>
+                    <input type="text" name="description" value="<%= task.description %>" required>
+                    <select name="status">
+                        <option value="pending" <%= task.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="completed" <%= task.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                    </select>
+                    <button type="submit">Save Changes</button>
+                </form>
+            </li>
+        <% }) %>
+    </ul>
+</body>
+</html>
